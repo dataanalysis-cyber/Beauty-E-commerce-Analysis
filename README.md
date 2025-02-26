@@ -151,9 +151,302 @@ plt.show()
 ```
 ![download](https://github.com/user-attachments/assets/b0494119-3fb3-4338-8633-3486c4f3dae4)
 
+  可以看出‘相宜本草’的总销售量和销售额都是最高的
+  
+<mark>待分析</mark>  
+
+### 3.3主类别和此类别销售量占比图
+```python
+#计算主次类别各品牌总销售量
+data1 = data_deal.groupby('main_type')['sale_count'].sum()
+data2 = data_deal.groupby('sub_type')['sale_count'].sum()
+
+#画饼状图
+fig,axes = plt.subplots(1,2,figsize = (12,10))
+data1 = data_deal.groupby('main_type')['sale_count'].sum()
+ax1 = data1.plot(kind = 'pie',ax = axes[0],autopct = '%.1f%%',  #设置百分比格式，并保留一位小数
+pctdistance = 0.6,#百分比标签到圆心的距离
+labels = data1.index,
+labeldistance = 1.05 ,#标签与圆心的距离
+startangle = 60 ,#初始角度
+radius = 2 ,#饼图半径
+counterclock = False, #设置为顺时针
+wedgeprops = {'linewidth':1.2,'edgecolor' : 'k'}, #设置饼图内外边界的属性
+textprops = {'fontsize' :10,'color': 'k'}  #设置文本属性
+)#设计饼图的细节
+
+ax1.set_title('主类别销售量占比',fontsize = 12,pad =100) 
+ax1.yaxis.set_visible(False)#隐藏纵轴标签
+
+data2 = data_deal.groupby('sub_type')['sale_count'].sum()
+ax2 = data2.plot(kind = 'pie',ax = axes[1],autopct = '%.1f%%' ,    #设置百分比格式，并保留一位小数
+pctdistance = 0.8,#百分比标签到圆心的距离
+labels = data2.index,
+labeldistance = 1.05 ,#标签与圆心的距离
+startangle = 60 ,#初始角度
+radius = 2,#饼图半径
+counterclock = False, #设置为顺时针
+wedgeprops = {'linewidth':1.2,'edgecolor' : 'k'}, #设置饼图内外边界的属性
+textprops = {'fontsize' :6,'color': 'k'}  #设置文本属性
+)#设计饼图的细节
+
+ax2.set_title('子类别销售量占比',fontsize = 12,pad =100) 
+ax2.yaxis.set_visible(False)#隐藏纵轴标签
+
+plt.subplots_adjust(wspace = 1)
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/263a96eb-dda0-43b5-b32f-42cf8c44915d)
+
+### 3.4各品牌各总类的总销售量堆叠图
+```python
+#准备数据
+stores = data_deal['店名'].unique()
+main_types = data_deal['main_type'].unique()
+sales_data = {store: {t: 0 for t in main_types} for store in stores}
+for _, row in data_deal.iterrows():
+    sales_data[row['店名']][row['main_type']] += row['sale_count']
+
+# 绘制堆叠柱状图
+fig, ax = plt.subplots(figsize=(20, 10))
+
+# 初始化底部位置
+bottom = [0] * len(stores)
+
+# 遍历每个类型，绘制堆叠条形
+for t in main_types:
+    sales = [sales_data[store][t] for store in stores]
+    ax.bar(stores, sales, bottom=bottom, label=t)
+    bottom = [b + s for b, s in zip(bottom, sales)]
+
+# 添加标题和标签
+plt.title('各品牌各总类的总销量堆叠图')
+plt.xlabel('店名')
+plt.ylabel('销量')
+plt.legend(title='商品类型')
+
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/93d16b34-6304-44ca-84e3-c14676eadbf2)
+
+### 3.5各品牌各总类的总销售额堆叠图
+```python
+#准备数据
+sales_money = {store: {t: 0 for t in main_types} for store in stores}
+for _, row in data_deal.iterrows():
+    sales_money[row['店名']][row['main_type']] += row['销售额']
+
+# 绘制堆叠柱状图
+fig, ax = plt.subplots(figsize=(20, 10))
+
+# 初始化底部位置
+bottom = [0] * len(stores)
+
+# 遍历每个类型，绘制堆叠条形
+for t in main_types:
+    sales = [sales_money[store][t] for store in stores]
+    ax.bar(stores, sales, bottom=bottom, label=t)
+    bottom = [b + s for b, s in zip(bottom, sales)]
+
+# 添加标题和标签
+plt.title('各品牌各总类的总销售额堆叠图')
+plt.xlabel('店名')
+plt.ylabel('销售额')
+plt.legend(title='商品类型')
 
 
 
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/973ab0f1-f598-4e20-84dd-bb07072bb714)
 
+### 3.6各品牌各子类的总销售量堆叠图
+```python
+# 准备数据
+stores = data_deal['店名'].unique()
+sub_types = data_deal['sub_type'].unique()
+sales_data1 = {store: {t: 0 for t in sub_types} for store in stores}
+for _, row in data_deal.iterrows():
+    sales_data1[row['店名']][row['sub_type']] += row['sale_count']
+
+# 绘制堆叠柱状图
+fig, ax = plt.subplots(figsize=(20, 12))
+
+# 初始化底部位置
+bottom = [0] * len(stores)
+
+# 遍历每个类型，绘制堆叠条形
+for t in sub_types:
+    sales = [sales_data1[store][t] for store in stores]
+    ax.bar(stores, sales, bottom=bottom, label=t)
+    bottom = [b + s for b, s in zip(bottom, sales)]
+
+# 添加标题和标签
+plt.title('各品牌各子类的总销量堆叠图')
+plt.xlabel('店名')
+plt.ylabel('销售量')
+plt.legend(title='商品类型')
+
+# 设置 y 轴范围
+max_sales = max([sum(sales_data1[store].values()) for store in stores])  # 计算最大总销量
+plt.ylim(0, max_sales * 1.05)  # 设置 y 轴上限为最大总销量的 1.05 倍
+
+# 显示图表
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/83a58e34-286d-41d5-b156-533ce43d9766)
+
+### 3.7各品牌各子类的总销售额堆叠图
+```python
+# 准备数据
+stores = data_deal['店名'].unique()
+sub_types = data_deal['sub_type'].unique()
+sales_money1 = {store: {t: 0 for t in sub_types} for store in stores}
+for _, row in data_deal.iterrows():
+    sales_money1[row['店名']][row['sub_type']] += row['销售额']
+
+# 绘制堆叠柱状图
+fig, ax = plt.subplots(figsize=(20, 12))
+
+# 初始化底部位置
+bottom = [0] * len(stores)
+
+# 遍历每个类型，绘制堆叠条形
+for t in sub_types:
+    sales = [sales_money1[store][t] for store in stores]
+    ax.bar(stores, sales, bottom=bottom, label=t)
+    bottom = [b + s for b, s in zip(bottom, sales)]
+
+# 添加标题和标签
+plt.title('各品牌各子类的总销售额堆叠图')
+plt.xlabel('店名')
+plt.ylabel('销售额')
+plt.legend(title='商品类型')
+
+# 设置 y 轴范围
+max_sales = max([sum(sales_money1[store].values()) for store in stores])  # 计算最大总销量
+plt.ylim(0, max_sales * 1.05)  # 设置 y 轴上限为最大总销量的 1.1 倍
+
+# 显示图表
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/45cf5f7a-c4a6-4a46-acef-129b7f89ffc1)
+
+### 3.8各品牌热度图
+```python
+data_deal.groupby('店名').comment_count.mean().sort_values(ascending = False).plot(kind = 'bar',color = colors,figsize=(18, 6),title='各品牌商品平均评论数',xlabel = '品牌',ylabel='评论数',rot=0)
+
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/e2b540fd-90e9-4657-8866-9f25836d918b)
+
+### 3.9各品牌销量热度散点图
+```python
+# 数据准备
+x = data_deal.groupby('店名')['sale_count'].mean()
+y = data_deal.groupby('店名')['comment_count'].mean()
+s = data_deal.groupby('店名')['price'].mean()
+txt = data_deal.groupby('店名')['price'].mean().index
+
+# 绘制散点图
+plt.figure(figsize=(12, 10))
+sns.scatterplot(x=x, y=y, size=s, hue=s, sizes=(100, 1500))
+
+# 添加店名标注
+for i in range(len(txt)):
+    plt.annotate(txt[i], xy=(x[i], y[i]))
+
+# 添加标题和标签
+plt.ylabel('热度')
+plt.xlabel('销量')
+
+# 显示图例
+plt.legend(loc='upper left')
+
+# 显示图表
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/647709fc-f3e9-415d-b424-146fbacc6d0c)
+
+### 3.10各品牌价格箱线图
+```python
+#查看价格的箱型图
+plt.figure(figsize=(14,6))
+sns.boxplot(x='店名',y='price',data=data_deal, palette='Accent')
+plt.ylim(0,3000)#如果不限制，就不容易看清箱型，所以把Y轴刻度缩小为0-3000
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/63158bea-55b8-4b52-9c59-493d6eaf6964)
+
+### 3.11各品牌平均价格
+```python
+#查看各品牌平均价格
+avg_price = data_deal.groupby('店名').price.sum()/data_deal.groupby('店名').price.count()
+fig = plt.figure(figsize=(12,6))
+avg_price.sort_values(ascending=False).plot(kind = 'bar',width = 0.8,alpha = 0.6,color = 'green',label = '各品牌平均价格')
+total_mean = data_deal['price'].mean()
+plt.axhline(total_mean,0,1,label='全平台平均价格')
+plt.ylabel('各品牌平均价格')
+plt.title('各品牌产品的平均价格',fontsize = 24)
+plt.legend(loc='best')
+    
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/093bbf3e-34b6-4422-ba48-a281a8e2af1e)
+
+### 3.12各品牌销售额和销量的散点图
+```python
+#销售额和销售量的散点图
+plt.figure(figsize = (12,10))
+
+x= data_deal.groupby('店名')['sale_count'].mean()
+y= data_deal.groupby('店名')['销售额'].mean()
+s=avg_price
+sns.scatterplot(x=x,y=y,size =s,sizes=(100,1500),marker = 'v',alpha=0.5,color='b',data=data_deal)
+for i in range(len(txt)):
+    plt.annotate(txt[i],xy=(x[i],y[i]),xytext = (x[i]+0.2, y[i]+0.2))  #在散点后面增加品牌信息的标签
+plt.xlabel('销量')
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/e06fc4de-dbde-4fd7-be00-7db5fe1506a5)
+
+### 3.13男士专用产品销量情况
+```python
+man_data= data_deal[data_deal['是否男士专用']=='是']
+categories = ['护肤品', '化妆品']
+man_data_distinct = man_data[man_data.main_type.isin(categories)]
+plt.figure(figsize=(10, 6))
+sns.barplot(x='店名',y='sale_count',hue='main_type',data=man_data_distinct,saturation=0.75,ci=0)
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/c82ba09b-163e-4f42-984e-c3fc834bb1a7)
+
+
+### 3.14男士专用产品销量排名和男士专用产品销售额排名
+```python
+f,[ax1,ax2]=plt.subplots(1,2,figsize = (12,6))
+man_data.groupby('店名').sale_count.sum().sort_values(ascending=True).plot(kind='barh',width=0.8,ax=ax1,color = colors)
+ax1.set_title('男士产品销量排名')
+man_data.groupby('店名').销售额.sum().sort_values(ascending=True).plot(kind='barh',width=0.8,ax=ax2,color = colors)
+ax2.set_title('男士产品销售额排名')
+
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/8814f4b9-2b9c-4ac7-93bc-6c2dcdc72891)
+
+### 3.15双十一前后时间销量关系图
+```python
+plt.figure(figsize = (12,6))
+data_deal.groupby('day')['sale_count'].sum().plot()
+plt.grid(linestyle="-.", color="gray", axis="x", alpha=0.5)
+x_major_locator = MultipleLocator(1)
+ax = plt.gca()
+ax.xaxis.set_major_locator(x_major_locator)
+plt.xlabel('日期(11月)')
+plt.ylabel('销量')
+ax.set_title('双十一前后时间销量关系图')
+plt.show()
+```
+![download](https://github.com/user-attachments/assets/a63414e8-1531-48e3-b81d-09bd5937383c)
 
 
